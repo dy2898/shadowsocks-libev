@@ -1,12 +1,6 @@
-FROM nginx:stable-alpine
+FROM alpine
 
-ENV PASSWD="passwd" SS_VER="3.1.3" \
-    ID="e92d4093-dbe9-4d6a-b615-e4971ee62fac"  V2RAY_VER="3.19"
-
-ADD conf/default.conf /etc/nginx/conf.d/
-ADD conf/ss_config.json /etc/ss_config.json
-ADD conf/v_config.json /etc/v_config.json
-ADD entrypoint.sh /entrypoint.sh
+ENV PASSWD="passwd" VER="3.1.3"
 
 RUN apk upgrade --update \
     && apk add bash libsodium \
@@ -27,9 +21,9 @@ RUN apk upgrade --update \
         udns-dev \
         tar \
         git \
-    && curl -sSLO https://github.com/shadowsocks/shadowsocks-libev/releases/download/v${SS_VER}/shadowsocks-libev-${SS_VER}.tar.gz \
-    && tar -zxf shadowsocks-libev-${SS_VER}.tar.gz \
-    && (cd shadowsocks-libev-${SS_VER} \
+    && curl -sSLO https://github.com/shadowsocks/shadowsocks-libev/releases/download/v${VER}/shadowsocks-libev-${VER}.tar.gz \
+    && tar -zxf shadowsocks-libev-${VER}.tar.gz \
+    && (cd shadowsocks-libev-${VER} \
     && ./configure --prefix=/usr --disable-documentation \
     && make install) \
     && git clone https://github.com/shadowsocks/simple-obfs.git \
@@ -45,12 +39,14 @@ RUN apk upgrade --update \
         )" \
     && apk add --virtual .run-deps $runDeps \
     && apk del .build-deps \
-    && rm -rf shadowsocks-libev-${SS_VER}.tar.gz \
-        shadowsocks-libev-${SS_VER} \
+    && rm -rf shadowsocks-libev-${SS_LIBEV_VERSION}.tar.gz \
+        shadowsocks-libev-${SS_LIBEV_VERSION} \
         simple-obfs \
-        /var/cache/apk/* \
-    && mkdir /var/log/v2ray \
-    && chmod +x /entrypoint.sh 
+        /var/cache/apk/*
+
+ADD entrypoint.sh /entrypoint.sh
+ADD config.json /etc/config.json
+RUN chmod x /entrypoint.sh 
 
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint.sh"]
