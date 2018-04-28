@@ -6,6 +6,6 @@
     "timeout":60,
     "method":"chacha20-ietf-poly1305",
     "plugin":"obfs-server",
-    "plugin_opts":"obfs=http;failover=127.0.0.1:80",
+    "plugin_opts":"obfs=http;failover=IP:PORT",
     "mode":"tcp_only"
 }
